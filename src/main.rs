@@ -22,8 +22,8 @@ fn main() {
                 arg!(-b --bucket <BUCKET> "Tag the appropriate career ladder bucket for this brag to fall under").required(true), 
                 Arg::new("log").action(ArgAction::Set).required(true)
             ]))
-        .subcommand(Command::new("read"))
-        .subcommand(Command::new("ladder"));
+        //.subcommand(Command::new("read").arg(Arg::new("filter").action(ArgAction::Set)))
+        .subcommand(Command::new("read").arg(arg!(-f --filter <FILTER> "Filter on career ladder bucket")));
 
     let matches = cmd.get_matches();
 
@@ -41,14 +41,14 @@ fn main() {
                 .get_one::<String>("bucket")
                 .expect("failed to get required flag");
 
-            writeln!(file, "{today} | {ladder_bucket} |{input}")
+            writeln!(file, "{today} | {ladder_bucket} | {input}")
                 .expect("failed to write to brag log");
 
             exit(0)
         }
     }
 
-    if let Some(_cmd) = matches.subcommand_matches("read") {
+    if let Some(cmd) = matches.subcommand_matches("read") {
         let mut log = OpenOptions::new()
             .read(true)
             .open(brag_log)
@@ -57,6 +57,19 @@ fn main() {
         let mut content = String::new();
         log.read_to_string(&mut content)
             .expect("failed to read log to string");
+
+        // TODO: add an enum to capture filter variants, locked to what's in the ladder; same for
+        // adding buckets
+        // TODO: cleanup and get rid of this conditional
+        let content = if let Some(filter) = cmd.get_one::<String>("filter") {
+            content
+                .lines()
+                .filter(|line| line.contains(filter))
+                .collect::<Vec<&str>>()
+                .join("\n")
+        } else {
+            content
+        };
 
         println!("{content}");
         exit(0)
