@@ -14,7 +14,8 @@ fn main() {
     std::fs::create_dir_all(brag_log_dir.clone()).expect("failed to create brag directory");
 
     let brag_log = brag_log_dir.join("log");
-    let ladder = brag_log_dir.join("ladder");
+    let ladder_doc = brag_log_dir.join("ladder");
+    let values_doc = brag_log_dir.join("values");
 
     let cmd = clap::Command::new("brag")
         .subcommand(Command::new("add")
@@ -23,7 +24,8 @@ fn main() {
                 Arg::new("log").action(ArgAction::Set).required(true)
             ]))
         .subcommand(Command::new("read").arg(arg!(-f --filter <FILTER> "Filter on career ladder bucket")))
-        .subcommand(Command::new("ladder"));
+        .subcommand(Command::new("ladder"))
+        .subcommand(Command::new("values"));
 
     let matches = cmd.get_matches();
 
@@ -78,13 +80,28 @@ fn main() {
     if let Some(_cmd) = matches.subcommand_matches("ladder") {
         let mut ladder = OpenOptions::new()
             .read(true)
-            .open(ladder)
+            .open(ladder_doc)
             .expect("failed to read ladder document");
 
         let mut content = String::new();
         ladder
             .read_to_string(&mut content)
             .expect("failed to read ladder to string");
+
+        println!("{content}");
+        exit(0)
+    }
+
+    if let Some(_cmd) = matches.subcommand_matches("values") {
+        let mut values = OpenOptions::new()
+            .read(true)
+            .open(values_doc)
+            .expect("failed to read values document");
+
+        let mut content = String::new();
+        values
+            .read_to_string(&mut content)
+            .expect("failed to read values to string");
 
         println!("{content}");
         exit(0)
