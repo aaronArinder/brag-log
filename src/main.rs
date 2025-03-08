@@ -22,8 +22,8 @@ fn main() {
                 arg!(-b --bucket <BUCKET> "Tag the appropriate career ladder bucket for this brag to fall under").required(true), 
                 Arg::new("log").action(ArgAction::Set).required(true)
             ]))
-        //.subcommand(Command::new("read").arg(Arg::new("filter").action(ArgAction::Set)))
-        .subcommand(Command::new("read").arg(arg!(-f --filter <FILTER> "Filter on career ladder bucket")));
+        .subcommand(Command::new("read").arg(arg!(-f --filter <FILTER> "Filter on career ladder bucket")))
+        .subcommand(Command::new("ladder"));
 
     let matches = cmd.get_matches();
 
